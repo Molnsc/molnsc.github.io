@@ -884,9 +884,7 @@
         const iframe = document.createElement("iframe");
         iframe.src = edgeUrl;
         iframe.id = "movieIframe";
-        iframe.setAttribute("referrerpolicy", "origin");
-        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-presentation allow-popups");
-        iframe.setAttribute("allow", "fullscreen; autoplay; encrypted-media");
+    
 
         document.getElementById("videoContainer").appendChild(iframe);
         document.getElementById('loadingText').style.display = 'none';
