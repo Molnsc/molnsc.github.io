@@ -12,7 +12,149 @@
 <body>
     <script>
 
-        let update = true;
+
+        (() => {
+  const PREV = document.getElementById('lumina-modal-host');
+  if (PREV) PREV.remove();
+
+  const host = document.createElement('div');
+  host.id = 'lumina-modal-host';
+  document.documentElement.appendChild(host);
+  const root = host.attachShadow({ mode: 'open' });
+
+  const style = document.createElement('style');
+  style.textContent = `
+    :host, * { box-sizing: border-box; }
+    :root { --lumina-radius: 28px; --lumina-z: 2147483000; }
+
+    .overlay {
+      position: fixed; inset: 0; z-index: var(--lumina-z);
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(10, 12, 16, 0.65); /* dark backdrop */
+      animation: fadeIn 220ms ease-out;
+    }
+    .shell {
+      width: min(580px, calc(100vw - 32px));
+      color: #E9EEF5;
+      background: rgba(20, 24, 32, 0.55);
+      backdrop-filter: blur(22px) saturate(140%); /* stronger blur glass effect */
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--lumina-radius);
+      box-shadow: 0 18px 48px rgba(0,0,0,0.55);
+      transform-origin: center;
+      animation: popIn 280ms cubic-bezier(.2,.9,.25,1.25);
+    }
+    .topbar {
+      padding: 22px 24px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .title {
+      margin: 0;
+      font: 800 30px/1.1 system-ui, sans-serif;
+      background: linear-gradient(90deg, #C6D2FF, #8FB2FF, #C6D2FF);
+      -webkit-background-clip: text; color: transparent;
+    }
+    .desc {
+      margin: 16px 0;
+      color: #B9C3D3;
+      font: 400 15px/1.6 system-ui, sans-serif;
+    }
+    .section {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      background: rgba(255,255,255,0.02);
+    }
+    .section h3 {
+      margin: 0 0 8px;
+      font: 700 14px/1.2 system-ui, sans-serif;
+      text-transform: uppercase;
+      color: #D7E1F2;
+    }
+    .section ul {
+      margin: 0; padding-left: 20px;
+      color: #C3CDDE;
+      font: 400 14px/1.6 system-ui, sans-serif;
+    }
+    .actions {
+      display: flex; justify-content: flex-end;
+      padding: 18px; border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .ok {
+      background: #fff; color: #0A0D14;
+      border: none; border-radius: 999px;
+      padding: 12px 22px; cursor: pointer;
+      font: 800 14px system-ui, sans-serif;
+      text-transform: uppercase;
+      box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+    }
+    .ok:hover { transform: translateY(-1px); }
+    @keyframes popIn {
+      from { transform: translateY(20px) scale(.96); opacity: 0 }
+      to   { transform: translateY(0) scale(1); opacity: 1 }
+    }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+  `;
+
+  const tpl = document.createElement('template');
+  tpl.innerHTML = `
+    <div class="overlay"></div>
+    <div class="shell" role="dialog" aria-modal="true">
+      <div class="topbar">
+        <h2 class="title">Lumina is Back!</h2>
+      </div>
+      <div class="body">
+        <div class="desc">
+          <strong>Thanks for sticking with me.</strong> Here's what is fixed:
+        </div>
+        <div class="section">
+          <h3>What's New</h3>
+          <ul>
+            <li>All movies & Shows</li>
+            <li>Save History Shows/Movies</li>
+            <li>Language Support for Russians</li>
+            <li>New LDR2 License</li>
+            <li>Improved Cache Servers and RS Servers</li>
+            <li>Realtime-Servers</li>
+          </ul>
+        </div>
+        <div class="section">
+          <h3>Costs</h3>
+          <ul>
+            <li>Members: Free</li>
+            <li>Premium: $9.99/mo (Offsale)</li>
+            <li>My Prices:</li>
+            <li>Servers: $599/mo</li>
+            <li>Quality Dataset: $299/wk</li>
+          </ul>
+        </div>
+        <div class="section">
+          <h3>Summary</h3>
+          <p>Lumina is stable for daily use. If anything feels off, Please feel free to reach out to me, Fixing the Lumina Issue took several months and determination and it is finally back, Expect slow updates.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="ok">OK!</button>
+      </div>
+    </div>
+  `;
+
+  const container = document.createElement('div');
+  container.appendChild(style);
+  const ui = document.createElement('div');
+  ui.appendChild(tpl.content.cloneNode(true));
+  container.appendChild(ui);
+  root.appendChild(container);
+
+  const okBtn = root.querySelector('.ok');
+  function close() { host.remove(); }
+  okBtn.addEventListener('click', close);
+})();
+
+
+        
+        let update = false;
 let fallback = false;
         let DATA = false;
 
