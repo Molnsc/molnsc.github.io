@@ -3,30 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LUMINA BETA</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Lumina</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="assets/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 </head>
 <body>
     <script>
-
-
-
-        
-        let update = false;
-let fallback = false;
-        let DATA = false;
-
-setInterval(() => {
-  if (update) {
-    window.location.href = "/UB.html";
-  } else if (fallback) {
-    window.location.href = "/ZZWORKING.html";
-  }
-}, 1000);
-        
         // Function to fetch the tokens from the JSON file on GitHub
         async function fetchTokens() {
             try {
@@ -132,7 +125,7 @@ setInterval(() => {
             const content = document.getElementById("announcementContent");
             const toggle = document.getElementById("announcementToggle");
             const isHidden = content.classList.contains("hidden");
-            
+
             if (isHidden) {
                 content.classList.remove("hidden");
                 toggle.classList.remove("collapsed");
@@ -198,10 +191,10 @@ setInterval(() => {
             toggle.classList.toggle('active');
             const isHidden = toggle.classList.contains('active');
             localStorage.setItem('hideFilters', isHidden);
-            
+
             const filtersSection = document.querySelector('.filters-section');
             if (filtersSection) {
-                filtersSection.style.display = isHidden ? 'none' : 'block';
+                filtersSection.style.display = isHidden ? 'block' : 'block';
             }
         }
 
@@ -210,7 +203,7 @@ setInterval(() => {
             toggle.classList.toggle('active');
             const isHidden = toggle.classList.contains('active');
             localStorage.setItem('hideAnnouncement', isHidden);
-            
+
             const announcementSection = document.getElementById('announcementSection');
             if (announcementSection) {
                 announcementSection.style.display = isHidden ? 'none' : 'block';
@@ -222,7 +215,7 @@ setInterval(() => {
             toggle.classList.toggle('active');
             const isHidden = toggle.classList.contains('active');
             localStorage.setItem('hideTrending', isHidden);
-            
+
             const trendingSection = document.querySelector('.trending-section');
             if (trendingSection) {
                 trendingSection.style.display = isHidden ? 'none' : 'block';
@@ -234,7 +227,7 @@ setInterval(() => {
             toggle.classList.toggle('active');
             const isHidden = toggle.classList.contains('active');
             localStorage.setItem('hideGenres', isHidden);
-            
+
             const genresSection = document.querySelector('.categories-section');
             if (genresSection) {
                 genresSection.style.display = isHidden ? 'none' : 'block';
@@ -246,7 +239,7 @@ setInterval(() => {
             toggle.classList.toggle('active');
             const isHidden = toggle.classList.contains('active');
             localStorage.setItem('hideMovies', isHidden);
-            
+
             const moviesGrid = document.getElementById('movies');
             if (moviesGrid) {
                 moviesGrid.style.display = isHidden ? 'none' : 'grid';
@@ -255,10 +248,11 @@ setInterval(() => {
 
         function toggleDeveloperMode() {
             const toggle = document.getElementById('developerModeToggle');
+            if (!toggle) return;
             toggle.classList.toggle('active');
             const isEnabled = toggle.classList.contains('active');
             localStorage.setItem('developerMode', isEnabled);
-            
+
             // Store in luminaSettings format for compatibility
             const settings = JSON.parse(localStorage.getItem('luminaSettings')) || {};
             settings.developerMode = isEnabled;
@@ -304,11 +298,11 @@ setInterval(() => {
                 orange: { primary: '#f59e0b', secondary: '#d97706' },
                 pink: { primary: '#ec4899', secondary: '#db2777' }
             };
-            
+
             if (themes[color]) {
                 root.style.setProperty('--accent-primary', themes[color].primary);
                 root.style.setProperty('--accent-secondary', themes[color].secondary);
-                
+
                 // Update progress bars and buttons
                 const style = document.createElement('style');
                 style.textContent = `
@@ -385,7 +379,8 @@ setInterval(() => {
             // Load developer mode setting
             if (localStorage.getItem('developerMode') === 'true' || 
                 (JSON.parse(localStorage.getItem('luminaSettings')) || {}).developerMode) {
-                document.getElementById('developerModeToggle').classList.add('active');
+                const devToggle = document.getElementById('developerModeToggle');
+                if (devToggle) devToggle.classList.add('active');
             }
 
             // Load accent color
@@ -407,7 +402,7 @@ setInterval(() => {
             document.querySelectorAll('.settings-tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            
+
             // Add active class to selected tab and content
             document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
             document.getElementById(`${tabName}-tab`).classList.add('active');
@@ -416,30 +411,29 @@ setInterval(() => {
         // Run the function when the page loads
         document.addEventListener("DOMContentLoaded", () => {
             checkToken();
-            checkAnnouncementState();
-            
+
             // Apply UI visibility settings after a short delay to ensure elements are loaded
             setTimeout(() => {
                 if (localStorage.getItem('hideFilters') === 'true') {
                     const filtersSection = document.querySelector('.filters-section');
                     if (filtersSection) filtersSection.style.display = 'none';
                 }
-                
+
                 if (localStorage.getItem('hideAnnouncement') === 'true') {
                     const announcementSection = document.getElementById('announcementSection');
                     if (announcementSection) announcementSection.style.display = 'none';
                 }
-                
+
                 if (localStorage.getItem('hideTrending') === 'true') {
                     const trendingSection = document.querySelector('.trending-section');
                     if (trendingSection) trendingSection.style.display = 'none';
                 }
-                
+
                 if (localStorage.getItem('hideGenres') === 'true') {
                     const genresSection = document.querySelector('.categories-section');
                     if (genresSection) genresSection.style.display = 'none';
                 }
-                
+
                 if (localStorage.getItem('hideMovies') === 'true') {
                     const moviesGrid = document.getElementById('movies');
                     if (moviesGrid) moviesGrid.style.display = 'none';
@@ -450,6 +444,13 @@ setInterval(() => {
 
     </script>
     <nav class="navbar">
+        <script>
+            // Ensure showSection is available immediately
+            function showSection(sectionName) {
+                // This will be overridden by script.js but provides fallback
+                console.log('Switching to section:', sectionName);
+            }
+        </script>
         <div class="nav-content">
             <div class="nav-left">
                 <h1 class="logo">Lumina</h1>
@@ -461,6 +462,13 @@ setInterval(() => {
                         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                     </svg>
                 </button>
+
+                <button class="search-toggle-btn" onclick="showUpdatesPopup()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 20h4v2h-4zm6-20H8c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zm-2 18h-4v-2h4v2zm2-8H8V4h8v6z"/>
+                    </svg>
+                </button>
+
                 <button class="settings-btn desktop-only" onclick="toggleSettings()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
@@ -488,6 +496,60 @@ setInterval(() => {
         </div>
     </nav>
 
+    <!-- Dedicated Search Results UI -->
+    <div class="search-results-overlay" id="searchResultsOverlay" onclick="closeSearchResults()"></div>
+    <div class="search-results-container" id="searchResultsContainer">
+        <div class="search-results-header">
+            <h2 class="search-results-title" id="searchResultsTitle">Search Results</h2>
+            <button class="search-results-close" onclick="closeSearchResults()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="search-results-content">
+            <div class="search-results-stats" id="searchResultsStats"></div>
+            <div class="search-loading" id="searchLoading" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+            <div class="search-results-grid" id="searchResultsGrid"></div>
+            <div class="search-results-empty" id="searchResultsEmpty" style="display: none;">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <h3>No Results Found</h3>
+                <p>Try different keywords or check your spelling</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="community-overlay" id="communityOverlay" onclick="closeCommunity()"></div>
+    <div class="community-container" id="communityContainer">
+        <div class="community-header">
+            <div class="community-title-section">
+                <h2 class="community-title">Community</h2>
+                <div class="community-stats">
+                    <span class="community-total">200.3K+ members in Community</span>
+                    <span class="community-total">476K+ posts in community</span>
+                </div>
+            </div>
+            <button class="community-close" onclick="closeCommunity()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="community-content">
+            <div class="community-feed" id="communityFeedMain">
+                <div class="community-limit-notice">
+                    Sorry at this time only the developer or original site users can access community, you are currently on an admin version of the site please go to the community site to view community posts.
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Mobile Bottom Navigation -->
     <div class="bottom-nav mobile-only">
         <button class="nav-item active" onclick="showSection('home')" data-section="home">
@@ -501,6 +563,12 @@ setInterval(() => {
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
             </svg>
             <span>Explore</span>
+        </button>
+        <button class="nav-item" onclick="showSection('party')" data-section="party">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2 22l1-2h18l1 2H2zm18.5-9c-.83 0-1.5-.67-1.5-1.5S19.67 10 20.5 10s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-17 0c-.83 0-1.5-.67-1.5-1.5S2.67 10 3.5 10 5 10.67 5 11.5 4.33 13 3.5 13zM12 4c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+            </svg>
+            <span>Party</span>
         </button>
         <button class="nav-item" onclick="showSection('settings')" data-section="settings">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -517,24 +585,9 @@ setInterval(() => {
                 <div class="loading-spinner" id="loading">
                     <div class="spinner"></div>
                 </div>
-                
+
                 <!-- Continue Watching Section will be inserted here by JavaScript -->
-                
-                <div class="announcement-section" id="announcementSection">
-                    <div class="announcement-header" onclick="toggleAnnouncement()">
-                        <h3>📢 Announcements & Updates</h3>
-                        <button class="announcement-toggle" id="announcementToggle">▼</button>
-                    </div>
-                    <div class="announcement-content" id="announcementContent">
-                        <h5>NEW UPDATE v1.517: Enhanced Settings Panel with Modern UI, Extra Accent Mods, Advanced Animations, Dynamic Blur Effects, Theater Mode, Smart Recommendations, Watch Party Mode, and improved mobile experience!</h5> <br>
-                        <h5>RECENT UPDATES: Stream HTML redesign with accent color matching, fixed season dropdown styling with dark backgrounds, enhanced trending section with proper bookmark functionality, continue watching improvements with better ordering (most recent left to right).</h5> <br>
-                        <h5>FEATURES: Glass Mode transparency, Enhanced color themes (Purple, Red, Green, Blue, Orange, Pink), Skip Intro/Credits, Preload episodes, Hide UI sections, Developer Mode, Export/Import settings, Watch statistics tracking.</h5> <br>
-                        <h5>For a better Website Experience please <a href="https://molnsc.github.io" target="_blank">Click here</a> to visit my Source Website. </h5> <br>
-                        <br>
-                        <p>Lumina displays content from third-party sources and does not host or control any media. We are not responsible for any copyright or legal issues related to third-party content, any related issues or complaints should be sent to rspxyum@gmail.com. </p> <br>
-                        <h5>iOS Mobile App: <a href="https://molnsc.github.io/lumina.mobileconfig" target="_blank">Click here</a></h5>
-                    </div>
-                </div>
+
 
                 <!-- Watch Later Section will be inserted here by JavaScript -->
 
@@ -556,35 +609,37 @@ setInterval(() => {
                 <div class="filters-section">
                     <div class="filters">
                         <select id="typeFilter" class="filter-input">
-                            <option value="movie">Movies</option>
-                            <option value="tv">TV Shows</option>
+                            <option value="movie">🎬 Movies</option>
+                            <option value="tv">📺 TV Shows</option>
                         </select>
                         <select id="yearFilter" class="filter-input">
-                            <option value="">All Years</option>
+                            <option value="">📅 All Years</option>
                             <script>
                                 const currentYear = new Date().getFullYear();
-                                for (let year = currentYear; year >= 1990; year--) {
+                                for (let year = currentYear; year >= 1950; year--) {
                                     document.write(`<option value="${year}">${year}</option>`);
                                 }
                             </script>
                         </select>
                         <select id="genreFilter" class="filter-input">
-                            <option value="">All Genres</option>
-                            <option value="action">Action</option>
-                            <option value="comedy">Comedy</option>
-                            <option value="horror">Horror</option>
-                            <option value="drama">Drama</option>
-                            <option value="romance">Romance</option>
-                            <option value="sci-fi">Sci-Fi</option>
-                            <option value="thriller">Thriller</option>
+                            <option value="">🎭 All Genres</option>
+                            <option value="action">⚡ Action</option>
+                            <option value="comedy">😂 Comedy</option>
+                            <option value="horror">👻 Horror</option>
+                            <option value="drama">🎭 Drama</option>
+                            <option value="romance">💕 Romance</option>
+                            <option value="sci-fi">🚀 Sci-Fi</option>
+                            <option value="thriller">🔥 Thriller</option>
+                            <option value="animation">🎨 Animation</option>
+                            <option value="documentary">📚 Documentary</option>
                         </select>
                         <select id="sortFilter" class="filter-input">
-                            <option value="popularity.desc">Most Popular</option>
-                            <option value="release_date.desc">Newest First</option>
-                            <option value="vote_average.desc">Highest Rated</option>
-                            <option value="revenue.desc">Top Grossing</option>
+                            <option value="popularity.desc">⭐ Most Popular</option>
+                            <option value="release_date.desc">🆕 Newest First</option>
+                            <option value="vote_average.desc">📊 Highest Rated</option>
+                            <option value="revenue.desc">💰 Top Grossing</option>
                         </select>
-                        <button onclick="fetchData()" class="apply-btn">Apply Filters</button>
+                        <button onclick="fetchData()" class="apply-btn">✨ Apply Filters</button>
                     </div>
                 </div>
 
@@ -608,9 +663,300 @@ setInterval(() => {
                     </div>
                 </div>
                 <div id="movies" class="movies-grid"></div>
+                <div style="text-align: center; margin: 2rem 0;">
+                    <button id="generateMoreBtn" onclick="generateMoreContent()" class="apply-btn" style="font-size: 1rem; padding: 1rem 2rem;">
+                        Generate More
+                    </button>
+                </div>
             </div>
 
-            <!-- Enhanced Settings Section for Mobile -->
+            <!-- Party Section -->
+            <div class="section hidden" id="partySection" style="background: var(--background-dark); color: var(--text-primary);">
+                <div class="party-container">
+                    <div class="party-header">
+                        <div class="party-icon">
+                            <svg width="60" height="60" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M2 22l1-2h18l1 2H2zm18.5-9c-.83 0-1.5-.67-1.5-1.5S19.67 10 20.5 10s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-17 0c-.83 0-1.5-.67-1.5-1.5S2.67 10 3.5 10 5 10.67 5 11.5 4.33 13 3.5 13zM12 4c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 12c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                            </svg>
+                        </div>
+                        <h1>Watch Party</h1>
+                        <p>Watch together with friends in real-time</p>
+                    </div>
+                    <div class="party-actions">
+                        <button class="party-btn create-party" onclick="createParty()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                            </svg>
+                            Create Party
+                        </button>
+                        <button class="party-btn join-party" onclick="joinParty()">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                            Join Party
+                        </button>
+                    </div>
+                    <div class="party-info">
+                        <div class="party-feature">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21 6h-7.59l3.29-3.29L16 2l-4 4-4-4-.71.71L10.59 6H3c-1.1 0-2 .89-2 2v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.11-.9-2-2-2zm0 14H3V8h18v12z"/>
+                            </svg>
+                            <span>Synchronized playback</span>
+                        </div>
+                        <div class="party-feature">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+                            </svg>
+                            <span>Live chat with friends</span>
+                        </div>
+                        <div class="party-feature">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            <span>No sign-up required</span>
+                        </div>
+                    </div>
+                    <div class="party-coming-soon">
+                        <span class="coming-soon-badge">Coming Soon</span>
+                        <p>Watch Party is currently in development. Stay tuned for updates!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="section hidden" id="profileSection" style="background: var(--background-dark); color: var(--text-primary); display: none;">
+                <!-- Firebase Auth Modal -->
+                <div class="auth-modal" id="authModal" style="display: none;">
+                    <div class="auth-modal-content">
+                        <div class="auth-header">
+                            <h2 id="authTitle">Welcome to Lumina</h2>
+                            <button class="close-btn" onclick="closeAuth()">×</button>
+                        </div>
+                        <div class="auth-form">
+                            <div class="auth-buttons">
+                                <button class="auth-submit-btn primary" onclick="showSignInForm()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                    </svg>
+                                    Sign In
+                                </button>
+                                <button class="auth-submit-btn secondary" onclick="showSignUpForm()">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Sign Up
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sign In Form -->
+                        <div class="auth-form-details" id="signInForm" style="display: none;">
+                            <h3>Sign In to Your Account</h3>
+                            <div class="form-group">
+                                <label for="signInEmail">Email</label>
+                                <input type="email" id="signInEmail" placeholder="Enter your email">
+                            </div>
+                            <div class="form-group">
+                                <label for="signInPassword">Password</label>
+                                <input type="password" id="signInPassword" placeholder="Enter your password">
+                            </div>
+                            <div class="auth-actions">
+                                <button class="auth-submit-btn primary" onclick="handleSignIn()">Sign In</button>
+                                <button class="auth-back-btn" onclick="showAuthButtons()">Back</button>
+                            </div>
+                            <div class="auth-links">
+                                <a href="#" onclick="showResetPassword()">Forgot Password?</a>
+                            </div>
+                        </div>
+
+                        <!-- Sign Up Form -->
+                        <div class="auth-form-details" id="signUpForm" style="display: none;">
+                            <h3>Create Your Account</h3>
+                            <div class="form-group">
+                                <label for="signUpEmail">Email</label>
+                                <input type="email" id="signUpEmail" placeholder="Enter your email">
+                            </div>
+                            <div class="form-group">
+                                <label for="signUpPassword">Password</label>
+                                <input type="password" id="signUpPassword" placeholder="Create a password">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password</label>
+                                <input type="password" id="confirmPassword" placeholder="Confirm your password">
+                            </div>
+                            <div class="form-group">
+                                <label for="displayName">Username</label>
+                                <input type="text" id="displayName" placeholder="Choose a username">
+                            </div>
+                            <div class="auth-actions">
+                                <button class="auth-submit-btn primary" onclick="handleSignUp()">Create Account</button>
+                                <button class="auth-back-btn" onclick="showAuthButtons()">Back</button>
+                            </div>
+                        </div>
+
+                        <!-- Password Reset Form -->
+                        <div class="auth-form-details" id="resetPasswordForm" style="display: none;">
+                            <h3>Reset Your Password</h3>
+                            <div class="form-group">
+                                <label for="resetEmail">Email</label>
+                                <input type="email" id="resetEmail" placeholder="Enter your email">
+                            </div>
+                            <div class="auth-actions">
+                                <button class="auth-submit-btn primary" onclick="handlePasswordReset()">Send Reset Email</button>
+                                <button class="auth-back-btn" onclick="showSignInForm()">Back to Sign In</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Content -->
+                <div class="profile-content" id="profileContent">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <div class="avatar-circle" id="userAvatar">
+                                <span id="avatarText">G</span>
+                            </div>
+                            <button class="edit-avatar-btn" onclick="editProfile()" id="editAvatarBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="profile-info">
+                            <h1 class="profile-username" id="profileUsername">Guest</h1>
+                            <p class="profile-email" id="profileEmail">guest@lumina.dev</p>
+                            <p class="profile-description" id="profileDescription">Welcome to Lumina! Sign up to save your preferences and create playlists.</p>
+                        </div>
+                        <div class="profile-privacy-section" id="profilePrivacySection" style="display: none;">
+                            <div class="privacy-toggle-main">
+                                <div class="privacy-info">
+                                    <label class="privacy-label">Profile Visibility</label>
+                                    <span class="privacy-description">Control who can see your profile</span>
+                                </div>
+                                <div class="privacy-slider">
+                                    <span class="privacy-option">Private</span>
+                                    <label class="profile-privacy-switch">
+                                        <input type="checkbox" id="profilePublic" onchange="updateProfilePrivacy()">
+                                        <span class="privacy-switch-slider"></span>
+                                    </label>
+                                    <span class="privacy-option">Public</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile-actions" id="profileActions">
+                            <button class="profile-btn" onclick="showAuth()">Sign In</button>
+                            <button class="profile-btn primary-btn" onclick="showAuth()">Sign Up</button>
+                        </div>
+                    </div>
+
+                    <div class="profile-tabs">
+                        <button class="tab-btn active" onclick="switchTab('watchlater')" data-tab="watchlater">Watch Later</button>
+                        <button class="tab-btn" onclick="switchTab('playlists')" data-tab="playlists">Playlists</button>
+                        <button class="tab-btn" onclick="switchTab('activity')" data-tab="activity">Activity</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <!-- Watch Later Tab -->
+                        <div class="tab-pane active" id="watchlaterTab">
+                            <div class="tab-header">
+                                <h3>Watch Later</h3>
+                                <div class="privacy-toggle" id="privacyToggleContainer">
+                                    <label>
+                                        <input type="checkbox" id="watchLaterPublic" onchange="updatePrivacySettings()">
+                                        <span class="toggle-slider"></span>
+                                        Public
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="watch-later-grid" id="watchLaterGrid">
+                                <!-- Watch later items will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Playlists Tab -->
+                        <div class="tab-pane" id="playlistsTab">
+                            <div class="tab-header">
+                                <h3>Playlists</h3>
+                                <button class="create-btn" onclick="createPlaylist()" id="createPlaylistBtn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                    </svg>
+                                    Create Playlist
+                                </button>
+                            </div>
+                            <div class="playlists-grid" id="playlistsGrid">
+                                <!-- Playlists will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Activity Tab -->
+                        <div class="tab-pane" id="activityTab">
+                            <div class="tab-header">
+                                <h3>Recent Activity</h3>
+                            </div>
+                            <div class="activity-feed" id="activityFeed">
+                                <!-- Activity items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Profile Modal -->
+                <div class="edit-modal" id="editModal" style="display: none;">
+                    <div class="edit-modal-content">
+                        <div class="edit-header">
+                            <h2>Edit Profile</h2>
+                            <button class="close-btn" onclick="closeEditModal()">×</button>
+                        </div>
+                        <div class="edit-form">
+                            <div class="form-group">
+                                <label for="editUsername">Username</label>
+                                <input type="text" id="editUsername" placeholder="Enter username">
+                            </div>
+                            <div class="form-group">
+                                <label for="editDescription">Description</label>
+                                <textarea id="editDescription" placeholder="Tell us about yourself..." rows="3"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+                                <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create Playlist Modal -->
+                <div class="playlist-modal" id="playlistModal" style="display: none;">
+                    <div class="playlist-modal-content">
+                        <div class="playlist-header">
+                            <h2>Create Playlist</h2>
+                            <button class="close-btn" onclick="closePlaylistModal()">×</button>
+                        </div>
+                        <div class="playlist-form">
+                            <div class="form-group">
+                                <label for="playlistName">Playlist Name</label>
+                                <input type="text" id="playlistName" placeholder="Enter playlist name">
+                            </div>
+                            <div class="form-group">
+                                <label for="playlistDescription">Description</label>
+                                <textarea id="playlistDescription" placeholder="Describe your playlist..." rows="2"></textarea>
+                            </div>
+                            <div class="privacy-toggle">
+                                <label>
+                                    <input type="checkbox" id="playlistPublic">
+                                    <span class="toggle-slider"></span>
+                                    Make Public
+                                </label>
+                            </div>
+                            <div class="form-actions">
+                                <button class="cancel-btn" onclick="closePlaylistModal()">Cancel</button>
+                                <button class="save-btn" onclick="savePlaylist()">Create Playlist</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="section hidden enhanced-mobile-settings" id="settingsSection">
                 <div class="settings-header-mobile">
                     <div class="settings-title-mobile">
@@ -623,7 +969,7 @@ setInterval(() => {
                         </div>
                     </div>
                     <div class="user-profile">
-                        <div class="avatar">L</div>
+                        <div class="avatar" style="background-color: white; color: black;">L</div>
                         <span class="username"></span>
                     </div>
                 </div>
@@ -656,345 +1002,396 @@ setInterval(() => {
                 </div>
 
                 <div class="settings-content-mobile">
-                    <!-- Theme Tab -->
-                    <div class="settings-tab-content-mobile active" id="appearance-mobile">
+                    <!-- Appearance Tab -->
+                    <div class="settings-tab-content active" id="appearance-tab">
                         <div class="settings-group-mobile">
-                            <h3>Background Effect</h3>
-                            <div class="setting-item-mobile glass-setting">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                                    </svg>
-                                </div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Glass Mode</label>
-                                    <span class="setting-description-mobile">Beautiful transparency effect</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobileTransparentToggle" onclick="toggleMobileTransparent()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
+                            <h3 class="group-title-mobile">Accent Color</h3>
+                            <div class="color-options-mobile">
+                                <button class="color-option active" data-color="purple" onclick="selectAccentColor('purple')" style="background: linear-gradient(135deg, #8b5cf6, #6366f1);"></button>
+                                <button class="color-option" data-color="red" onclick="selectAccentColor('red')" style="background: linear-gradient(135deg, #ef4444, #dc2626);"></button>
+                                <button class="color-option" data-color="green" onclick="selectAccentColor('green')" style="background: linear-gradient(135deg, #10b981, #059669);"></button>
+                                <button class="color-option" data-color="blue" onclick="selectAccentColor('blue')" style="background: linear-gradient(135deg, #3b82f6, #2563eb);"></button>
+                                <button class="color-option" data-color="orange" onclick="selectAccentColor('orange')" style="background: linear-gradient(135deg, #f59e0b, #d97706);"></button>
+                                <button class="color-option" data-color="pink" onclick="selectAccentColor('pink')" style="background: linear-gradient(135deg, #ec4899, #db2777);"></button>
                             </div>
                         </div>
-
                         <div class="settings-group-mobile">
-                            <h3>Enhanced Effects</h3>
+                            <h3 class="group-title-mobile">Display</h3>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                </div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Extra Accent Mods</label>
-                                    <span class="setting-description-mobile">Enhanced accent colors on more elements</span>
+                                    <span class="setting-label-mobile">Transparent Mode</span>
+                                    <span class="setting-desc-mobile">Enable glass effect on cards</span>
                                 </div>
-                                <div class="enhanced-toggle" id="mobileExtraAccentToggle" onclick="toggleExtraAccentMods()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                            <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z"/>
-                                    </svg>
-                                </div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Enhanced Animations</label>
-                                    <span class="setting-description-mobile">Smooth micro-animations and transitions</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobileAnimationsToggle" onclick="toggleEnhancedAnimations()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                            <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M9 11H7v9a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2z"/>
-                                    </svg>
-                                </div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Dynamic Blur Effects</label>
-                                    <span class="setting-description-mobile">Advanced backdrop blur and depth</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobileBlurToggle" onclick="toggleDynamicBlur()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="settings-group-mobile">
-                            <h3>Color Theme</h3>
-                            <div class="color-grid-mobile">
-                                <div class="color-card active" style="background: linear-gradient(135deg, #8b5cf6, #6366f1)" data-color="purple" onclick="selectMobileColor('purple')">
-                                    <div class="color-name">Purple Magic</div>
-                                    <div class="color-preview"></div>
-                                </div>
-                                <div class="color-card" style="background: linear-gradient(135deg, #ef4444, #dc2626)" data-color="red" onclick="selectMobileColor('red')">
-                                    <div class="color-name">Ruby Red</div>
-                                    <div class="color-preview"></div>
-                                </div>
-                                <div class="color-card" style="background: linear-gradient(135deg, #10b981, #059669)" data-color="green" onclick="selectMobileColor('green')">
-                                    <div class="color-name">Emerald</div>
-                                    <div class="color-preview"></div>
-                                </div>
-                                <div class="color-card" style="background: linear-gradient(135deg, #3b82f6, #2563eb)" data-color="blue" onclick="selectMobileColor('blue')">
-                                    <div class="color-name">Ocean Blue</div>
-                                    <div class="color-preview"></div>
-                                </div>
-                                <div class="color-card" style="background: linear-gradient(135deg, #f59e0b, #d97706)" data-color="orange" onclick="selectMobileColor('orange')">
-                                    <div class="color-name">Sunset</div>
-                                    <div class="color-preview"></div>
-                                </div>
-                                <div class="color-card" style="background: linear-gradient(135deg, #ec4899, #db2777)" data-color="pink" onclick="selectMobileColor('pink')">
-                                    <div class="color-name">Flamingo</div>
-                                    <div class="color-preview"></div>
+                                <div class="toggle-switch" id="mobileTransparentToggle" onclick="toggleMobileTransparent()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Video Tab -->
-                    <div class="settings-tab-content-mobile" id="playback-mobile">
+                    <!-- Playback Tab -->
+                    <div class="settings-tab-content" id="playback-tab">
                         <div class="settings-group-mobile">
-                            <h3>Playback Controls</h3>
+                            <h3 class="group-title-mobile">Playback Settings</h3>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
-                                    </svg>
-                                </div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Auto-play Next Episode</label>
-                                    <span class="setting-description-mobile">Automatically continue to next episode</span>
+                                    <span class="setting-label-mobile">Autoplay</span>
+                                    <span class="setting-desc-mobile">Auto-play next episode</span>
                                 </div>
-                                <div class="enhanced-toggle active" id="mobileAutoplayToggle" onclick="toggleMobileAutoplay()">
-                                    <div class="toggle-slider-enhanced"></div>
+                                <div class="toggle-switch active" id="mobileAutoplayToggle" onclick="toggleMobileAutoplay()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                    </svg>
-                                </div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Save Watch Progress</label>
-                                    <span class="setting-description-mobile">Remember where you left off</span>
+                                    <span class="setting-label-mobile">Save Progress</span>
+                                    <span class="setting-desc-mobile">Remember watch position</span>
                                 </div>
-                                <div class="enhanced-toggle active" id="mobileSaveProgressToggle" onclick="toggleMobileSaveProgress()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="settings-group-mobile">
-                            <h3>Quality & Performance</h3>
-                            <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-4v4h-2v-4H9V9h4V5h2v4h4v2z"/>
-                                    </svg>
-                                </div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Preload Next Episode</label>
-                                    <span class="setting-description-mobile">Faster episode switching</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobilePreloadToggle" onclick="togglePreload()">
-                                    <div class="toggle-slider-enhanced"></div>
+                                <div class="toggle-switch active" id="mobileSaveProgressToggle" onclick="toggleMobileSaveProgress()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M9 12l-4.5 4L3 14.5 8.5 9 3 3.5 4.5 2 9 6.5 13.5 2 15 3.5 10.5 9 15 14.5 13.5 16 9 11.5z"/>
-                                    </svg>
-                                </div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Skip Intro/Credits</label>
-                                    <span class="setting-description-mobile">Auto-skip opening and ending sequences</span>
+                                    <span class="setting-label-mobile">Show Time Left Progress Bar</span>
+                                    <span class="setting-desc-mobile">Display visual progress bar under time remaining</span>
                                 </div>
-                                <div class="enhanced-toggle" id="mobileSkipIntroToggle" onclick="toggleSkipIntro()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                            <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                                    </svg>
-                                </div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Theater Mode</label>
-                                    <span class="setting-description-mobile">Immersive full-screen experience</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobileTheaterToggle" onclick="toggleTheaterMode()">
-                                    <div class="toggle-slider-enhanced"></div>
+                                <div class="toggle-switch active" id="mobileTimeProgressToggle" onclick="toggleMobileTimeProgress()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Layout Tab -->
-                    <div class="settings-tab-content-mobile" id="interface-mobile">
+                    <!-- Interface Tab -->
+                    <div class="settings-tab-content" id="interface-tab">
                         <div class="settings-group-mobile">
-                            <h3>Home Screen</h3>
+                            <h3 class="group-title-mobile">Show/Hide Sections</h3>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">📢</div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Hide Announcements</label>
-                                    <span class="setting-description-mobile">Remove announcement panel</span>
+                                    <span class="setting-label-mobile">Hide Announcement</span>
+                                    <span class="setting-desc-mobile">Hide announcement banner</span>
                                 </div>
-                                <div class="enhanced-toggle" id="mobileHideAnnouncementToggle" onclick="toggleMobileHideAnnouncement()">
-                                    <div class="toggle-slider-enhanced"></div>
+                                <div class="toggle-switch" id="mobileHideAnnouncementToggle" onclick="toggleMobileHideAnnouncement()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">🔥</div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Hide Trending</label>
-                                    <span class="setting-description-mobile">Remove trending section</span>
+                                    <span class="setting-label-mobile">Hide Trending</span>
+                                    <span class="setting-desc-mobile">Hide trending section</span>
                                 </div>
-                                <div class="enhanced-toggle" id="mobileHideTrendingToggle" onclick="toggleMobileHideTrending()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="settings-group-mobile">
-                            <h3>Explore Page</h3>
-                            <div class="setting-item-mobile">
-                                <div class="setting-icon">🎭</div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Hide Genre Buttons</label>
-                                    <span class="setting-description-mobile">Remove category navigation</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobileHideGenresToggle" onclick="toggleMobileHideGenres()">
-                                    <div class="toggle-slider-enhanced"></div>
+                                <div class="toggle-switch" id="mobileHideTrendingToggle" onclick="toggleMobileHideTrending()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">🎬</div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Hide Movies Grid</label>
-                                    <span class="setting-description-mobile">Remove main content grid</span>
+                                    <span class="setting-label-mobile">Hide Filters</span>
+                                    <span class="setting-desc-mobile">Hide filter options</span>
                                 </div>
-                                <div class="enhanced-toggle" id="mobileHideMoviesToggle" onclick="toggleMobileHideMovies()">
-                                    <div class="toggle-slider-enhanced"></div>
+                                <div class="toggle-switch" id="mobileHideFiltersToggle" onclick="toggleMobileHideFilters()">
+                                    <div class="toggle-slider-mobile"></div>
+                                </div>
+                            </div>
+                            <div class="setting-item-mobile">
+                                <div class="setting-info-mobile">
+                                    <span class="setting-label-mobile">Hide Genres</span>
+                                    <span class="setting-desc-mobile">Hide genre buttons</span>
+                                </div>
+                                <div class="toggle-switch" id="mobileHideGenresToggle" onclick="toggleMobileHideGenres()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Advanced Tab -->
-                    <div class="settings-tab-content-mobile" id="advanced-mobile">
+                    <div class="settings-tab-content" id="advanced-tab">
                         <div class="settings-group-mobile">
-                            <h3>Advanced Features</h3>
+                            <h3 class="group-title-mobile">Developer Options</h3>
                             <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                </div>
                                 <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Smart Recommendations</label>
-                                    <span class="setting-description-mobile">AI-powered content suggestions</span>
+                                    <span class="setting-label-mobile">Developer Mode</span>
+                                    <span class="setting-desc-mobile">Show debug info</span>
                                 </div>
-                                <div class="enhanced-toggle" id="mobileSmartRecsToggle" onclick="toggleSmartRecommendations()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                            <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                                    </svg>
-                                </div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Watch Party Mode</label>
-                                    <span class="setting-description-mobile">Sync viewing with friends</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobileWatchPartyToggle" onclick="toggleWatchParty()">
-                                    <div class="toggle-slider-enhanced"></div>
-                                </div>
-                            </div>
-                            <div class="setting-item-mobile">
-                                <div class="setting-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M8 3a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H8zM3 13a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-4zM12 13a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-4z"/>
-                                    </svg>
-                                </div>
-                                <div class="setting-info-mobile">
-                                    <label class="setting-label-mobile">Developer Mode</label>
-                                    <span class="setting-description-mobile">Enable debugging features</span>
-                                </div>
-                                <div class="enhanced-toggle" id="mobileDeveloperModeToggle" onclick="toggleMobileDeveloperMode()">
-                                    <div class="toggle-slider-enhanced"></div>
+                                <div class="toggle-switch" id="mobileDeveloperModeToggle" onclick="toggleMobileDeveloperMode()">
+                                    <div class="toggle-slider-mobile"></div>
                                 </div>
                             </div>
                         </div>
-
                         <div class="settings-group-mobile">
-                            <h3>Data Management</h3>
-                            <div class="action-buttons">
-                                <button class="action-btn warning" onclick="clearWatchHistory()">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
-                                    </svg>
-                                    Clear Watch History
-                                </button>
-                                <button class="action-btn primary" onclick="exportSettings()">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                    </svg>
-                                    Export Settings
-                                </button>
-                                <button class="action-btn secondary" onclick="importSettings()">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                                    </svg>
-                                    Import Settings
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="settings-group-mobile">
-                            <h3>About</h3>
-                            <div class="about-info">
-                                <div class="app-info">
-                                    <div class="app-icon">L</div>
-                                    <div>
-                                        <h4>Lumina</h4>
-                                        <p>Version 1.517 Beta</p>
-                                    </div>
-                                </div>
-                                <div class="stats-grid">
-                                    <div class="stat-item">
-                                        <span class="stat-number" id="moviesWatchedCount">0</span>
-                                        <span class="stat-label">Movies Watched</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-number" id="episodesWatchedCount">0</span>
-                                        <span class="stat-label">Episodes Watched</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-number" id="hoursWatchedCount">0</span>
-                                        <span class="stat-label">Hours Watched</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <span class="stat-number" id="bookmarksCount">0</span>
-                                        <span class="stat-label">Bookmarks</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <h3 class="group-title-mobile">Data Management</h3>
+                            <button class="danger-btn-mobile" onclick="clearWatchHistory()">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </svg>
+                                Clear Watch History
+                            </button>
                         </div>
                     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Enhanced Mobile Settings Panel -->
     <div class="mobile-settings-overlay" id="mobileSettingsOverlay" onclick="closeMobileSettings()"></div>
 
     <script src="script.js"></script>
