@@ -1,1 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Core</title>
+</head>
+<body>
+<script>
+(async () => {
+  const params = new URLSearchParams(window.location.search);
 
+  const id = params.get("id");
+  const season = params.get("season");
+  const episode = params.get("episode");
+
+  if (!id || !season || !episode) {
+    document.body.innerText = "Missing parameters";
+    return;
+  }
+
+  const workerUrl = `https://use-1-tv.rspxyum.workers.dev/?id=${encodeURIComponent(id)}&season=${encodeURIComponent(season)}&episode=${encodeURIComponent(episode)}`;
+
+  try {
+    const res = await fetch(workerUrl);
+    const data = await res.json();
+
+    const videoUrl = data.url;
+
+    if (!videoUrl) {
+      document.body.innerText = "No URL returned from API";
+      return;
+    }
+
+    // pass to player
+    const redirectUrl =
+      `player.html?id=${encodeURIComponent(id)}&season=${encodeURIComponent(season)}&episode=${encodeURIComponent(episode)}&src=${encodeURIComponent(videoUrl)}`;
+
+    window.location.href = redirectUrl;
+
+  } catch (err) {
+    console.error(err);
+    document.body.innerText = "Failed to fetch API";
+  }
+})();
+</script>
+</body>
+</html>
