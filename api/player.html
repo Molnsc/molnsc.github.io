@@ -1,1 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Player</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: black;
+      overflow: hidden;
+    }
 
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<iframe id="player" allowfullscreen></iframe>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const src = params.get("src");
+
+  if (!src) {
+    document.body.innerHTML = "No video source provided";
+  } else {
+    document.getElementById("player").src = decodeURIComponent(src);
+  }
+</script>
+
+</body>
+</html>
