@@ -48,7 +48,93 @@
     </style>
 </head>
 <body>
+<!-- LUMINA ADS POPUP -->
+<div id="luminaOverlay" class="lumina-overlay" style="display:none;">
+  <div class="lumina-popup">
+    <h2>Lumina Ads Notice</h2>
 
+    <p>
+      Lumina will temporarily include ads on select shows and movies. This is not permanent.
+      This change is due to third-party vendors rolling out ads on their platform, which Lumina
+      is currently integrated with.
+    </p>
+
+    <p>
+      We are actively working with our partners to reduce or remove these ads. Until a solution
+      is in place, ads may appear during playback.
+    </p>
+
+    <button class="lumina-btn" onclick="closeLuminaPopup()">Got it</button>
+  </div>
+</div>
+
+<style>
+  .lumina-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+  }
+
+  .lumina-popup {
+    width: 90%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    font-family: Arial, sans-serif;
+    animation: luminaFade 0.2s ease-in-out;
+  }
+
+  .lumina-popup h2 {
+    margin-top: 0;
+    font-size: 20px;
+  }
+
+  .lumina-popup p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+  }
+
+  .lumina-btn {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .lumina-btn:hover {
+    background: #333;
+  }
+
+  @keyframes luminaFade {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+<script>
+  function showLuminaPopup() {
+    document.getElementById("luminaOverlay").style.display = "flex";
+  }
+
+  function closeLuminaPopup() {
+    document.getElementById("luminaOverlay").style.display = "none";
+  }
+
+  // auto-show on page load (no reloads, just displays overlay)
+  window.addEventListener("load", function () {
+    showLuminaPopup();
+  });
+</script>
 
 
     <iframe 
