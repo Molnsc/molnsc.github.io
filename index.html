@@ -48,92 +48,180 @@
     </style>
 </head>
 <body>
-<!-- LUMINA ADS POPUP -->
-<div id="luminaOverlay" class="lumina-overlay" style="display:none;">
-  <div class="lumina-popup">
-    <h2>Lumina Ads Notice</h2>
-
-    <p>
-      Lumina will temporarily pause this project. We are currently experiencing issues with a Ad-Rollout program
-        from our vendors. Lumina will remain unusable until a solution is found. Lumina does not want to support these ads!
-        Lumina pays these vendors to have rights without ADs, We are working on a solution.
-    </p>
-
-    <p>
-      We are actively working with our partners to reduce or remove these ads. Until a solution
-      is in place, ads may appear during playback.
-    </p>
-
-    <button class="lumina-btn" onclick="closeLuminaPopup()">OKAY</button>
-  </div>
-</div>
-
 <style>
-  .lumina-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999999;
-  }
+:root{
+    --bg: rgba(0,0,0,0.55);
+    --card: #ffffff;
+    --text: #111111;
+    --muted: rgba(0,0,0,0.65);
+    --line: rgba(0,0,0,0.08);
+}
 
-  .lumina-popup {
-    width: 90%;
-    max-width: 420px;
-    background: #fff;
-    border-radius: 14px;
-    padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    font-family: Arial, sans-serif;
-    animation: luminaFade 0.2s ease-in-out;
-  }
+.lumina-popup-overlay{
+    position:fixed;
+    inset:0;
+    background:var(--bg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:999999;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
 
-  .lumina-popup h2 {
-    margin-top: 0;
-    font-size: 20px;
-  }
+.lumina-popup{
+    width:min(680px, 92%);
+    background:var(--card);
+    border-radius:22px;
+    padding:34px 32px;
+    position:relative;
 
-  .lumina-popup p {
-    font-size: 14px;
-    line-height: 1.5;
-    color: #333;
-  }
+    box-shadow:
+        0 30px 80px rgba(0,0,0,0.25),
+        0 1px 0 rgba(0,0,0,0.04);
 
-  .lumina-btn {
-    margin-top: 12px;
-    padding: 10px 14px;
-    background: #111;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
+    transform: translateY(20px) scale(0.98);
+    opacity:0;
+    animation: pop .45s cubic-bezier(.2,.9,.2,1) forwards;
+}
 
-  .lumina-btn:hover {
-    background: #333;
-  }
+.lumina-popup h1{
+    font-size:30px;
+    font-weight:700;
+    letter-spacing:-0.03em;
+    color:var(--text);
+    margin-bottom:10px;
+}
 
-  @keyframes luminaFade {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
-  }
+.lumina-popup .sub{
+    font-size:15px;
+    line-height:1.6;
+    color:var(--muted);
+    margin-bottom:14px;
+}
+
+.lumina-popup .divider{
+    height:1px;
+    background:var(--line);
+    margin:18px 0;
+}
+
+.lumina-popup ul{
+    margin:0;
+    padding-left:18px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.75;
+}
+
+.lumina-close{
+    position:absolute;
+    top:14px;
+    right:14px;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:18px;
+    color:rgba(0,0,0,0.6);
+
+    transition: all .2s ease;
+}
+
+.lumina-close:hover{
+    transform: scale(1.08);
+    background:#f5f5f5;
+}
+
+.lumina-button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    margin-top:18px;
+    padding:12px 18px;
+
+    border-radius:999px;
+    background:#111;
+    color:#fff;
+    text-decoration:none;
+    font-weight:500;
+    font-size:14px;
+
+    transition: all .2s ease;
+}
+
+.lumina-button:hover{
+    transform: translateY(-1px);
+    opacity:0.92;
+}
+
+@keyframes pop{
+    to{
+        opacity:1;
+        transform: translateY(0) scale(1);
+    }
+}
 </style>
 
+<div class="lumina-popup-overlay" id="luminaPopup">
+    <div class="lumina-popup">
+
+        <button class="lumina-close" id="closeLuminaPopup">×</button>
+
+        <h1>Lumina is Back</h1>
+
+        <div class="sub">
+            <strong style="color:#111;">Ads have been removed</strong> and Lumina is fully usable again.
+        </div>
+
+        <div class="sub">
+            A major update is in development — focused on performance, streaming quality, and a full platform redesign.
+        </div>
+
+        <div class="divider"></div>
+
+        <ul>
+            <li>Higher quality streaming experience</li>
+            <li>Up to 5 optimized streaming servers</li>
+            <li>Premium high-speed infrastructure upgrades</li>
+            <li>Improved storage and show saving</li>
+            <li>Skip intro / skip end support (API)</li>
+            <li>Complete UI overhaul</li>
+            <li>Stability and speed improvements</li>
+        </ul>
+
+        <a class="lumina-button" href="#">Continue to Lumina</a>
+    </div>
+</div>
+
 <script>
-  function showLuminaPopup() {
-    document.getElementById("luminaOverlay").style.display = "flex";
-  }
+(() => {
+    const ID = "POPUPH16";
+    const popup = document.getElementById("luminaPopup");
+    const closeBtn = document.getElementById("closeLuminaPopup");
 
-  function closeLuminaPopup() {
-    document.getElementById("luminaOverlay").style.display = "none";
-  }
+    if (localStorage.getItem(ID)) {
+        popup?.remove();
+        return;
+    }
 
-  // auto-show on page load (no reloads, just displays overlay)
-  window.addEventListener("load", function () {
-    showLuminaPopup();
-  });
+    function closePopup(){
+        localStorage.setItem(ID, "1");
+        popup.style.opacity = "0";
+        popup.style.transform = "translateY(10px) scale(0.99)";
+        setTimeout(() => popup.remove(), 200);
+    }
+
+    closeBtn.addEventListener("click", closePopup);
+})();
 </script>
 
 
