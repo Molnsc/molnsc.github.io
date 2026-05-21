@@ -198,7 +198,7 @@
             <li>Stability and speed improvements</li>
         </ul>
 
-        <a class="lumina-button" href="#">Continue to Lumina</a>
+        <a class="lumina-button" href="javascript:void(0)" id="continueBtn">Continue to Lumina</a>
     </div>
 </div>
 
@@ -207,6 +207,10 @@
     const ID = "POPUPH16";
     const popup = document.getElementById("luminaPopup");
     const closeBtn = document.getElementById("closeLuminaPopup");
+    const continueBtn = document.getElementById("continueBtn");
+
+    // OPTIONAL: set your real site here
+    const LUMINA_URL = ""; // e.g. "https://your-site.com"
 
     if (localStorage.getItem(ID)) {
         popup?.remove();
@@ -215,12 +219,25 @@
 
     function closePopup(){
         localStorage.setItem(ID, "1");
+
         popup.style.opacity = "0";
         popup.style.transform = "translateY(10px) scale(0.99)";
+
         setTimeout(() => popup.remove(), 200);
     }
 
     closeBtn.addEventListener("click", closePopup);
+
+    continueBtn.addEventListener("click", () => {
+        closePopup();
+
+        // if you want redirect, enable this:
+        if (LUMINA_URL) {
+            setTimeout(() => {
+                window.location.href = LUMINA_URL;
+            }, 150);
+        }
+    });
 })();
 </script>
 
